@@ -17,9 +17,10 @@ git rev-parse HEAD
 
 или последний коммит: https://github.com/SachEnka/Kxakaton/commits/main
 
-**Commit hash:** `72a6460ded6a594dd25b76339063ef1e16600898`
+**Commit hash:** `e32c92e320ba3246da52363d289615b2cb16f958`
 
 Актуальный tip ветки `main`: https://github.com/SachEnka/Kxakaton/commits/main
+
 (пакет сдачи: схема + README + этот файл; следующий коммит может только уточнять hash)
 
 ## Как жюри запускает

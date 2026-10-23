@@ -146,6 +146,82 @@ pre {
 .kpi span { display: block; color: #5e6876; font-size: 13px; }
 .kpi strong { font-size: 20px; }
 
+.simulator {
+  background: linear-gradient(160deg, #faf7f2 0%, #f3ebe1 100%);
+  border: 1px solid #e4ddd2;
+  border-radius: 16px;
+  padding: 16px 18px;
+  display: grid;
+  gap: 12px;
+}
+.simulator-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  align-items: baseline;
+}
+.simulator-head strong { font-size: 18px; }
+.fit-ok { color: #1f7a4d; }
+.fit-tight { color: #8a5a12; }
+.fit-heavy { color: #9d2c2c; }
+.fit-unknown { color: #5e6876; }
+
+.offer-board {
+  background: #fffdf9;
+  border: 1px solid #e4ddd2;
+  border-radius: 18px;
+  padding: 20px;
+  display: grid;
+  gap: 16px;
+  box-shadow: 0 10px 30px rgba(48, 36, 20, 0.04);
+}
+.offer-board.alt {
+  border-color: #c9893a;
+  background: linear-gradient(180deg, #fff9f0 0%, #fffdf9 42%);
+}
+.offer-requested {
+  display: grid;
+  gap: 4px;
+  padding-bottom: 12px;
+  border-bottom: 1px dashed #e4ddd2;
+}
+.offer-requested span { color: #5e6876; font-size: 13px; }
+.offer-requested strong {
+  font-size: 28px;
+  text-decoration: line-through;
+  text-decoration-thickness: 2px;
+  color: #8a8074;
+}
+.offer-board.ok .offer-requested strong {
+  text-decoration: none;
+  color: #1c2430;
+}
+.offer-compare {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: stretch;
+}
+.offer-side {
+  background: #faf7f2;
+  border-radius: 14px;
+  padding: 14px;
+  display: grid;
+  gap: 6px;
+}
+.offer-side.highlight {
+  background: #1c2430;
+  color: #f7f3ec;
+}
+.offer-side.highlight .muted { color: #c8c1b6; }
+.offer-arrow {
+  align-self: center;
+  color: #8a8074;
+  font-size: 22px;
+  font-weight: 700;
+}
+
 .login-layout { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 28px; align-items: start; }
 .hero {
   padding: 12px 8px;
@@ -153,7 +229,8 @@ pre {
 .hero h1 { font-size: 48px; }
 
 @media (max-width: 860px) {
-  .split, .login-layout, .choices, .grid-2, .kpis { grid-template-columns: 1fr; }
+  .split, .login-layout, .choices, .grid-2, .kpis, .offer-compare { grid-template-columns: 1fr; }
+  .offer-arrow { display: none; }
   .hero h1, h1 { font-size: 32px; }
   .topbar { padding: 14px; align-items: flex-start; flex-direction: column; }
   .journal li { grid-template-columns: 1fr; }

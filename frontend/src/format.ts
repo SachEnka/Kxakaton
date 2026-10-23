@@ -7,6 +7,42 @@ export function money(value: number | null | undefined): string {
   }).format(value);
 }
 
+/** Ориентировочный аннуитетный платёж — как на бэкенде. */
+export function annuityPayment(amount: number, annualRatePercent: number, months: number): number {
+  if (!amount || !months || amount <= 0 || months <= 0) return 0;
+  const r = annualRatePercent / 100 / 12;
+  if (r === 0) return Math.round((amount / months) * 100) / 100;
+  const power = (1 + r) ** months;
+  return Math.round(((amount * r * power) / (power - 1)) * 100) / 100;
+}
+
+export const PURPOSE_RATES: Record<string, { rate: number; product: string; label: string }> = {
+  TURNOVER: { rate: 20, product: "TURNOVER", label: "оборотный кредит" },
+  DEVELOPMENT: { rate: 18, product: "DEVELOPMENT", label: "кредит на развитие" },
+  CASH_GAP: { rate: 22, product: "OVERDRAFT", label: "овердрафт" },
+  UNKNOWN: { rate: 19, product: "LINE", label: "кредитная линия" },
+};
+
+export type FitLevel = "ok" | "tight" | "heavy" | "unknown";
+
+export function burdenFit(payment: number, monthlyRevenue: number | null | undefined): {
+  level: FitLevel;
+  share: number | null;
+  label: string;
+} {
+  if (!monthlyRevenue || monthlyRevenue <= 0 || !payment) {
+    return { level: "unknown", share: null, label: "Укажите выручку, чтобы оценить нагрузку" };
+  }
+  const share = payment / monthlyRevenue;
+  if (share <= 0.25) {
+    return { level: "ok", share, label: `Платёж около ${(share * 100).toFixed(0)}% выручки — комфортная нагрузка` };
+  }
+  if (share <= 0.4) {
+    return { level: "tight", share, label: `Платёж около ${(share * 100).toFixed(0)}% выручки — нагрузка повышенная` };
+  }
+  return { level: "heavy", share, label: `Платёж около ${(share * 100).toFixed(0)}% выручки — выше комфортного уровня` };
+}
+
 export function rate(value: number | null | undefined): string {
   if (value == null) return "—";
   return `${new Intl.NumberFormat("ru-RU", { maximumFractionDigits: 2 }).format(value)}%`;

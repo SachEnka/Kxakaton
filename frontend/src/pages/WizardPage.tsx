@@ -1,7 +1,17 @@
-import { FormEvent, useEffect, useRef, useState } from "react";
+import { FormEvent, useEffect, useMemo, useRef, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { api, loadUser, type Application, type ProductCard } from "../api";
-import { day, money, PRESETS, PURPOSES, rate, type RegistryCard } from "../format";
+import {
+  annuityPayment,
+  burdenFit,
+  day,
+  money,
+  PRESETS,
+  PURPOSE_RATES,
+  PURPOSES,
+  rate,
+  type RegistryCard,
+} from "../format";
 
 export function WizardPage() {
   const navigate = useNavigate();
@@ -103,6 +113,8 @@ export function WizardPage() {
         body: JSON.stringify({
           inn,
           legal_form: legalForm,
+          amount,
+          term_months: term,
           monthly_revenue: revenue,
           monthly_expenses: expenses,
           comment,
@@ -119,7 +131,19 @@ export function WizardPage() {
       active = false;
       window.clearTimeout(timer);
     };
-  }, [step, draftId, inn, legalForm, revenue, expenses, comment, pending]);
+  }, [step, draftId, inn, legalForm, amount, term, revenue, expenses, comment, pending]);
+
+  const simRate = useMemo(() => {
+    if (cards) {
+      const chosen = [cards.primary, cards.alternative].find((item) => item?.code === productCode);
+      if (chosen) return chosen.base_rate;
+    }
+    const byProduct: Record<string, number> = { TURNOVER: 20, DEVELOPMENT: 18, OVERDRAFT: 22, LINE: 19 };
+    return byProduct[productCode] ?? PURPOSE_RATES[purpose]?.rate ?? 20;
+  }, [cards, productCode, purpose]);
+
+  const payment = useMemo(() => annuityPayment(amount, simRate, term), [amount, simRate, term]);
+  const fit = useMemo(() => burdenFit(payment, revenue || preset?.revenue), [payment, revenue, preset]);
 
   async function recommend(event: FormEvent) {
     event.preventDefault();
@@ -177,6 +201,8 @@ export function WizardPage() {
         body: JSON.stringify({
           inn,
           legal_form: legalForm,
+          amount,
+          term_months: term,
           monthly_revenue: revenue,
           monthly_expenses: expenses,
           comment,
@@ -214,6 +240,13 @@ export function WizardPage() {
             <label>Сумма, ₽<input type="number" min={1} value={amount} onChange={(event) => setAmount(Number(event.target.value))} required /></label>
             <label>Срок, месяцев<input type="number" min={1} max={120} value={term} onChange={(event) => setTerm(Number(event.target.value))} required /></label>
           </div>
+          <ConditionsSimulator
+            payment={payment}
+            rateValue={simRate}
+            fitClass={`fit-${fit.level}`}
+            fitLabel={fit.label}
+            hint={`Ориентир по ставке ${rate(simRate)} для ${PURPOSE_RATES[purpose]?.label || "продукта"}. Точные условия появятся после проверок.`}
+          />
           <button className="primary" type="submit" disabled={pending}>Подобрать продукт</button>
         </form>
       )}
@@ -229,6 +262,8 @@ export function WizardPage() {
               <p>{card.reason}</p>
               <p className="muted">
                 {money(card.min_amount)} – {money(card.max_amount)}, {card.min_term}–{card.max_term} мес., ставка от {rate(card.base_rate)}
+                {" · "}
+                платёж ≈ {money(annuityPayment(card.fits ? amount : card.suggested_amount, card.base_rate, card.fits ? term : card.suggested_term))}
               </p>
               {!card.fits && (
                 <p className="note">
@@ -262,6 +297,8 @@ export function WizardPage() {
         <form className="panel stack" onSubmit={submit}>
           <p className="muted">Контактное лицо — {loadUser()?.full_name}. Повторно его вводить не нужно. Продукт: {productCode}.</p>
           <div className="grid-2">
+            <label>Сумма, ₽<input type="number" min={1} value={amount} onChange={(event) => setAmount(Number(event.target.value))} required /></label>
+            <label>Срок, месяцев<input type="number" min={1} max={120} value={term} onChange={(event) => setTerm(Number(event.target.value))} required /></label>
             <label>
               ИНН
               <input
@@ -281,6 +318,13 @@ export function WizardPage() {
             <label>Выручка в месяц, ₽<input type="number" min={0} value={revenue} onChange={(event) => setRevenue(Number(event.target.value))} required /></label>
             <label>Расходы в месяц, ₽<input type="number" min={0} value={expenses} onChange={(event) => setExpenses(Number(event.target.value))} required /></label>
           </div>
+          <ConditionsSimulator
+            payment={payment}
+            rateValue={simRate}
+            fitClass={`fit-${fit.level}`}
+            fitLabel={fit.label}
+            hint="Меняйте сумму и срок — платёж и оценка нагрузки обновляются сразу. После отправки банк проверит данные и может предложить другие условия."
+          />
           {registryLoading && <p className="muted">Ищем организацию в ЕГРЮЛ и «Прозрачном бизнесе»…</p>}
           {registryError && <p className="alert" role="alert">{registryError}</p>}
           {registry && (
@@ -325,5 +369,33 @@ export function WizardPage() {
         </form>
       )}
     </main>
+  );
+}
+
+function ConditionsSimulator({
+  payment,
+  rateValue,
+  fitClass,
+  fitLabel,
+  hint,
+}: {
+  payment: number;
+  rateValue: number;
+  fitClass: string;
+  fitLabel: string;
+  hint: string;
+}) {
+  return (
+    <section className="simulator" aria-live="polite">
+      <div className="simulator-head">
+        <div>
+          <p className="muted">Ориентировочный платёж</p>
+          <strong>{money(payment)}</strong>
+          <span className="muted"> / мес. · ставка {rate(rateValue)}</span>
+        </div>
+        <p className={fitClass}>{fitLabel}</p>
+      </div>
+      <p className="muted">{hint}</p>
+    </section>
   );
 }

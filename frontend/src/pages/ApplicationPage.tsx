@@ -1,7 +1,7 @@
 import { FormEvent, useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { api, type Application } from "../api";
-import { day, money, rate, when } from "../format";
+import { annuityPayment, day, money, rate, when } from "../format";
 
 export function ApplicationPage() {
   const { id } = useParams();
@@ -53,6 +53,8 @@ export function ApplicationPage() {
   if (error && !application) return <main className="page"><p className="alert" role="alert">{error}</p></main>;
   if (!application) return <main className="page"><p>Загружаем заявку…</p></main>;
   const decision = application.decision;
+  const isCounter = application.status === "APPROVED_WITH_CHANGES";
+  const isApproved = application.status === "APPROVED";
 
   return (
     <main className="page stack">
@@ -84,22 +86,19 @@ export function ApplicationPage() {
               <button className="primary" disabled={pending} type="submit">Отправить ответ</button>
             </form>
           )}
-          {decision && application.status !== "DECISION_READY" && (
+          {isCounter && decision && (
+            <CounterOfferBoard application={application} pending={pending} onAccept={() => act("/accept-offer")} onDecline={() => act("/decline-offer")} />
+          )}
+          {isApproved && decision && (
+            <ApprovedBoard application={application} pending={pending} onAccept={() => act("/accept-offer")} />
+          )}
+          {decision && !isCounter && !isApproved && application.status !== "DECISION_READY" && (
             <DecisionCard application={application} />
           )}
           {application.status === "DECISION_READY" && (
             <p className="note">{decision?.explanation || "Сотрудник банка проверяет оценку."}</p>
           )}
           <div className="row">
-            {application.status === "APPROVED" && (
-              <button className="primary" type="button" disabled={pending} onClick={() => act("/accept-offer")}>Перейти к оформлению</button>
-            )}
-            {application.status === "APPROVED_WITH_CHANGES" && (
-              <>
-                <button className="primary" type="button" disabled={pending} onClick={() => act("/accept-offer")}>Принять условия</button>
-                <button className="secondary" type="button" disabled={pending} onClick={() => act("/decline-offer")}>Отказаться</button>
-              </>
-            )}
             {application.status === "CONTRACTING" && (
               <button className="primary" type="button" disabled={pending} onClick={() => act("/sign")}>Подписать</button>
             )}
@@ -139,6 +138,108 @@ export function ApplicationPage() {
         </ul>
       </section>
     </main>
+  );
+}
+
+function CounterOfferBoard({
+  application,
+  pending,
+  onAccept,
+  onDecline,
+}: {
+  application: Application;
+  pending: boolean;
+  onAccept: () => void;
+  onDecline: () => void;
+}) {
+  const decision = application.decision!;
+  const requestedPayment = annuityPayment(
+    application.amount,
+    decision.offered_rate ?? 20,
+    application.term_months,
+  );
+  return (
+    <section className="offer-board alt stack">
+      <div className="offer-requested">
+        <span>Запрошенная сумма</span>
+        <strong>{money(application.amount)}</strong>
+      </div>
+      <div>
+        <h2>Мы можем предложить другие условия</h2>
+        <p>
+          {decision.explanation ||
+            "По результатам демонстрационной оценки финансов компании рассчитана более комфортная кредитная нагрузка."}
+        </p>
+      </div>
+      <div className="offer-compare">
+        <div className="offer-side">
+          <p className="muted">Запрос</p>
+          <strong>{money(application.amount)}</strong>
+          <p className="muted">{application.term_months} мес.</p>
+          <p className="muted">платёж ≈ {money(requestedPayment)}</p>
+        </div>
+        <div className="offer-arrow" aria-hidden>→</div>
+        <div className="offer-side highlight">
+          <p className="muted">Доступно</p>
+          <strong>{money(decision.offered_amount)}</strong>
+          <p className="muted">{decision.offered_term_months} мес. · {rate(decision.offered_rate)}</p>
+          <p>платёж {money(decision.monthly_payment)}</p>
+        </div>
+      </div>
+      <div className="kpis">
+        <div className="kpi"><span>Доступная сумма</span><strong>{money(decision.offered_amount)}</strong></div>
+        <div className="kpi"><span>Срок</span><strong>{decision.offered_term_months} мес.</strong></div>
+        <div className="kpi"><span>Ставка</span><strong>{rate(decision.offered_rate)}</strong></div>
+        <div className="kpi"><span>Платёж</span><strong>{money(decision.monthly_payment)}</strong></div>
+      </div>
+      {decision.changes.length > 0 && (
+        <ul>
+          {decision.changes.map((change) => (
+            <li key={change.field}>
+              {change.field}: было{" "}
+              {change.field === "Ставка" ? rate(change.requested) : change.field === "Срок" ? `${change.requested} мес.` : money(change.requested)}
+              , стало{" "}
+              {change.field === "Ставка" ? rate(change.offered) : change.field === "Срок" ? `${change.offered} мес.` : money(change.offered)}
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="row">
+        <button className="primary" type="button" disabled={pending} onClick={onAccept}>Принять условия</button>
+        <button className="secondary" type="button" disabled={pending} onClick={onDecline}>Отказаться</button>
+      </div>
+    </section>
+  );
+}
+
+function ApprovedBoard({
+  application,
+  pending,
+  onAccept,
+}: {
+  application: Application;
+  pending: boolean;
+  onAccept: () => void;
+}) {
+  const decision = application.decision!;
+  return (
+    <section className="offer-board ok stack">
+      <div className="offer-requested">
+        <span>Одобренная сумма</span>
+        <strong>{money(decision.offered_amount ?? application.amount)}</strong>
+      </div>
+      <div>
+        <h2>Условия совпали с запросом</h2>
+        <p>{decision.explanation}</p>
+      </div>
+      <div className="kpis">
+        <div className="kpi"><span>Сумма</span><strong>{money(decision.offered_amount)}</strong></div>
+        <div className="kpi"><span>Срок</span><strong>{decision.offered_term_months} мес.</strong></div>
+        <div className="kpi"><span>Ставка</span><strong>{rate(decision.offered_rate)}</strong></div>
+        <div className="kpi"><span>Платёж</span><strong>{money(decision.monthly_payment)}</strong></div>
+      </div>
+      <button className="primary" type="button" disabled={pending} onClick={onAccept}>Перейти к оформлению</button>
+    </section>
   );
 }
 

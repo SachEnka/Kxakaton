@@ -1,0 +1,47 @@
+products:
+  TURNOVER:
+    title: Оборотный кредит
+    summary: На закупку товара и другие оборотные расходы.
+    min_amount: 300000
+    max_amount: 10000000
+    min_term: 6
+    max_term: 36
+    base_rate: 20
+  DEVELOPMENT:
+    title: Кредит на развитие
+    summary: На оборудование, ремонт и запуск нового направления.
+    min_amount: 500000
+    max_amount: 20000000
+    min_term: 12
+    max_term: 60
+    base_rate: 18
+  OVERDRAFT:
+    title: Овердрафт
+    summary: На короткий кассовый разрыв, когда деньги нужны быстро.
+    min_amount: 100000
+    max_amount: 3000000
+    min_term: 3
+    max_term: 12
+    base_rate: 22
+  LINE:
+    title: Кредитная линия
+    summary: Когда сумма нужна частями или цель пока смешанная.
+    min_amount: 500000
+    max_amount: 15000000
+    min_term: 12
+    max_term: 36
+    base_rate: 19
+
+purposes:
+  TURNOVER:
+    title: Пополнение оборотных средств
+    product: TURNOVER
+  DEVELOPMENT:
+    title: Развитие бизнеса
+    product: DEVELOPMENT
+  CASH_GAP:
+    title: Кассовый разрыв
+    product: OVERDRAFT
+  UNKNOWN:
+    title: Пока не знаю
+    product: LINE

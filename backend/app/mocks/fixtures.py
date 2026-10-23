@@ -1,0 +1,230 @@
+from datetime import date, timedelta
+
+
+FAIL_INN = "7700000099"
+
+
+def demo_fixtures(as_of: date) -> dict[str, dict]:
+    young = (as_of - timedelta(days=90)).isoformat()
+    return {
+        "7700000001": {
+            "egrul": {
+                "full_name": "Общество с ограниченной ответственностью «Северная лавка»",
+                "short_name": "ООО «Северная лавка»",
+                "legal_form": "OOO",
+                "ogrn": "1187746123456",
+                "status": "ACTIVE",
+                "registration_date": "2018-03-15",
+                "okved": "47.11",
+                "okved_name": "Торговля розничная преимущественно пищевыми продуктами",
+                "address": "г. Москва, ул. Правды, д. 8",
+                "director_name": "Белова Анна Сергеевна",
+                "unreliable_address": False,
+                "unreliable_director": False,
+                "charter_capital": 100000,
+            },
+            "bki": {
+                "active_count": 1,
+                "total_debt": 180000,
+                "total_monthly_payment": 15000,
+                "max_overdue_days": 0,
+                "loans": [
+                    {
+                        "type": "Оборотный кредит",
+                        "opened_on": "2023-05-20",
+                        "amount": 400000,
+                        "balance": 180000,
+                        "monthly_payment": 15000,
+                        "overdue_days": 0,
+                        "status": "ACTIVE",
+                    }
+                ],
+            },
+            "fns": {
+                "tax_regime": "USN",
+                "employees_count": 6,
+                "income_last_year": 12000000,
+                "expense_last_year": 9000000,
+                "tax_debt": False,
+                "tax_debt_amount": 0,
+                "suspended_accounts": False,
+                "bankruptcy_procedure": None,
+            },
+        },
+        "7700000002": {
+            "egrul": {
+                "full_name": "Общество с ограниченной ответственностью «Волга Трейд»",
+                "short_name": "ООО «Волга Трейд»",
+                "legal_form": "OOO",
+                "ogrn": "1167746000002",
+                "status": "ACTIVE",
+                "registration_date": "2016-02-01",
+                "okved": "46.90",
+                "okved_name": "Торговля оптовая неспециализированная",
+                "address": "г. Волгоград, пр-т Ленина, д. 15",
+                "director_name": "Орлов Павел Игоревич",
+                "unreliable_address": False,
+                "unreliable_director": False,
+                "charter_capital": 500000,
+            },
+            "bki": {
+                "active_count": 2,
+                "total_debt": 2400000,
+                "total_monthly_payment": 100000,
+                "max_overdue_days": 0,
+                "loans": [
+                    {
+                        "type": "Кредитная линия",
+                        "opened_on": "2022-11-01",
+                        "amount": 3000000,
+                        "balance": 2400000,
+                        "monthly_payment": 100000,
+                        "overdue_days": 0,
+                        "status": "ACTIVE",
+                    }
+                ],
+            },
+            "fns": {
+                "tax_regime": "OSNO",
+                "employees_count": 14,
+                "income_last_year": 18000000,
+                "expense_last_year": 17000000,
+                "tax_debt": False,
+                "tax_debt_amount": 0,
+                "suspended_accounts": False,
+                "bankruptcy_procedure": None,
+            },
+        },
+        "7700000003": {
+            "egrul": {
+                "full_name": "Общество с ограниченной ответственностью «Риф»",
+                "short_name": "ООО «Риф»",
+                "legal_form": "OOO",
+                "ogrn": "1147746000003",
+                "status": "ACTIVE",
+                "registration_date": "2014-07-19",
+                "okved": "41.20",
+                "okved_name": "Строительство жилых и нежилых зданий",
+                "address": "г. Москва, ул. Речная, д. 4",
+                "director_name": "Котова Мария Павловна",
+                "unreliable_address": False,
+                "unreliable_director": False,
+                "charter_capital": 10000,
+            },
+            "bki": {
+                "active_count": 1,
+                "total_debt": 500000,
+                "total_monthly_payment": 25000,
+                "max_overdue_days": 0,
+                "loans": [
+                    {
+                        "type": "Кредит на развитие",
+                        "opened_on": "2021-04-01",
+                        "amount": 1500000,
+                        "balance": 500000,
+                        "monthly_payment": 25000,
+                        "overdue_days": 0,
+                        "status": "ACTIVE",
+                    }
+                ],
+            },
+            "fns": {
+                "tax_regime": "OSNO",
+                "employees_count": 4,
+                "income_last_year": 9000000,
+                "expense_last_year": 8000000,
+                "tax_debt": False,
+                "tax_debt_amount": 0,
+                "suspended_accounts": False,
+                "bankruptcy_procedure": "COMPETITION",
+            },
+        },
+        "7700000004": {
+            "egrul": {
+                "full_name": "Индивидуальный предприниматель Смирнов Алексей Андреевич",
+                "short_name": "ИП Смирнов А. А.",
+                "legal_form": "IP",
+                "ogrn": "319774600000004",
+                "status": "ACTIVE",
+                "registration_date": "2019-09-02",
+                "okved": "56.10",
+                "okved_name": "Деятельность ресторанов и услуги по доставке продуктов питания",
+                "address": "г. Москва, ул. Пекарская, д. 2",
+                "director_name": "Смирнов Алексей Андреевич",
+                "unreliable_address": False,
+                "unreliable_director": False,
+                "charter_capital": 0,
+            },
+            "bki": {
+                "active_count": 1,
+                "total_debt": 700000,
+                "total_monthly_payment": 40000,
+                "max_overdue_days": 120,
+                "loans": [
+                    {
+                        "type": "Оборотный кредит",
+                        "opened_on": "2024-01-15",
+                        "amount": 900000,
+                        "balance": 700000,
+                        "monthly_payment": 40000,
+                        "overdue_days": 120,
+                        "status": "OVERDUE",
+                    }
+                ],
+            },
+            "fns": {
+                "tax_regime": "USN",
+                "employees_count": 2,
+                "income_last_year": 4200000,
+                "expense_last_year": 3900000,
+                "tax_debt": False,
+                "tax_debt_amount": 0,
+                "suspended_accounts": False,
+                "bankruptcy_procedure": None,
+            },
+        },
+        "7700000005": {
+            "egrul": {
+                "full_name": "Общество с ограниченной ответственностью «Новый цех»",
+                "short_name": "ООО «Новый цех»",
+                "legal_form": "OOO",
+                "ogrn": "1257700000005",
+                "status": "ACTIVE",
+                "registration_date": young,
+                "okved": "25.11",
+                "okved_name": "Производство строительных металлических конструкций",
+                "address": "г. Москва, проезд Заводской, д. 1",
+                "director_name": "Новиков Игорь Олегович",
+                "unreliable_address": False,
+                "unreliable_director": False,
+                "charter_capital": 10000,
+            },
+            "bki": {
+                "active_count": 1,
+                "total_debt": 120000,
+                "total_monthly_payment": 20000,
+                "max_overdue_days": 15,
+                "loans": [
+                    {
+                        "type": "Кредит",
+                        "opened_on": young,
+                        "amount": 200000,
+                        "balance": 120000,
+                        "monthly_payment": 20000,
+                        "overdue_days": 15,
+                        "status": "ACTIVE",
+                    }
+                ],
+            },
+            "fns": {
+                "tax_regime": "USN",
+                "employees_count": 1,
+                "income_last_year": 0,
+                "expense_last_year": 0,
+                "tax_debt": False,
+                "tax_debt_amount": 0,
+                "suspended_accounts": False,
+                "bankruptcy_procedure": None,
+            },
+        },
+    }

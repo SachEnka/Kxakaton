@@ -1,0 +1,62 @@
+@base = http://localhost:8000
+
+### login
+POST {{base}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "client.good@demo.local",
+  "password": "Demo-2026"
+}
+
+### recommend
+POST {{base}}/api/applications/recommend
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "purpose": "TURNOVER",
+  "amount": 1500000,
+  "term_months": 18
+}
+
+### create draft
+POST {{base}}/api/applications
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "purpose": "TURNOVER",
+  "product_code": "TURNOVER",
+  "amount": 1500000,
+  "term_months": 18
+}
+
+### fill draft
+PATCH {{base}}/api/applications/{{application_id}}
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "inn": "7700000001",
+  "legal_form": "OOO",
+  "monthly_revenue": 800000,
+  "monthly_expenses": 450000
+}
+
+### submit
+POST {{base}}/api/applications/{{application_id}}/submit
+Authorization: Bearer {{token}}
+
+### read
+GET {{base}}/api/applications/{{application_id}}
+Authorization: Bearer {{token}}
+
+### registry by inn
+GET {{base}}/api/registry/7728168971
+Authorization: Bearer {{token}}
+
+### underwriter queue
+# token сотрудника underwriter@demo.local / Demo-2026
+GET {{base}}/api/underwriter/applications
+Authorization: Bearer {{underwriter_token}}

@@ -38,9 +38,26 @@ API и Swagger: http://localhost:8000/docs
 
 - `backend` — FastAPI, PostgreSQL, state machine, моки, скоринг.
 - `frontend` — два кабинета на React.
-- `docs` — состояния, модель данных, сценарии, коллекция запросов, пометки о симуляторах.
+- `docs` — архитектура, состояния, модель данных, сценарии, коллекция запросов, пометки о симуляторах.
 
 Конвейер после отправки считается синхронно в API. Очередь сообщений в MVP нет.
+
+Документы для проверки:
+
+- [Архитектурная схема](docs/architecture.md)
+- [Состояния заявки](docs/state-machine.md)
+- [Модель данных](docs/data-model.md)
+- [Тестовые сценарии](docs/test-scenarios.md)
+- [Коллекция API](docs/api.http)
+- [THIRD_PARTY_NOTICES](docs/THIRD_PARTY_NOTICES.md)
+- [Материалы для сдачи](docs/SUBMISSION.md)
+
+## Сдача жюри
+
+- Репозиторий: https://github.com/SachEnka/Kxakaton (публичный, ветка `main`)
+- Аккаунт жюри из ТЗ: `alfa-hack-2026` — доступ по ссылке; при необходимости collaborator
+- Commit hash версии: см. [docs/SUBMISSION.md](docs/SUBMISSION.md) и https://github.com/SachEnka/Kxakaton/commits/main
+- Основной способ проверки: локальный Docker (выше). Облако — опционально, инструкция в `docs/SUBMISSION.md`
 
 ## Ограничения
 

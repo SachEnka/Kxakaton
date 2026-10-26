@@ -1,0 +1,118 @@
+# THIRD_PARTY_NOTICES
+
+Перечень сторонних компонентов, внешних источников данных и ограничений интеграций проекта «Умный кредитный кабинет предпринимателя».
+
+Версии взяты из файлов зависимостей репозитория: `backend/requirements.txt`, `frontend/package.json`, `frontend/package-lock.json`, `backend/Dockerfile`, `frontend/Dockerfile`, `docker-compose.yml`. Лицензии сверены с первоисточниками (страницы пакетов на PyPI, поле `license` в `package-lock.json`, страницы лицензий проектов), ссылки приведены в таблицах. Дата сверки лицензий: 2026-10-26.
+
+Лицензии самих файлов репозитория (исходный код проекта) в репозитории не заявлены: файла `LICENSE` нет. Это решение владельца, в документ оно не вписывается.
+
+## 1. Backend: прямые зависимости (`backend/requirements.txt`)
+
+Версии закреплены (`==`). Python-образ — `python:3.12-slim`.
+
+| Пакет | Версия | Лицензия | Первоисточник | Зачем в проекте |
+|---|---|---|---|---|
+| fastapi | 0.115.6 | MIT | [PyPI](https://pypi.org/project/fastapi/0.115.6/) · [GitHub](https://github.com/fastapi/fastapi) | HTTP API, Swagger/OpenAPI |
+| uvicorn | 0.34.0 | BSD-3-Clause | [PyPI](https://pypi.org/project/uvicorn/0.34.0/) · [GitHub](https://github.com/encode/uvicorn) | ASGI-сервер |
+| sqlalchemy | 2.0.36 | MIT | [PyPI](https://pypi.org/project/SQLAlchemy/2.0.36/) · [GitHub](https://github.com/sqlalchemy/sqlalchemy/) | ORM, доступ к PostgreSQL |
+| alembic | 1.14.0 | MIT | [PyPI](https://pypi.org/project/alembic/1.14.0/) · [GitHub](https://github.com/sqlalchemy/alembic/) | Миграция `0001_initial` |
+| psycopg[binary] (psycopg) | 3.2.3 | LGPL-3.0 (на PyPI: «GNU Lesser General Public License v3 (LGPLv3)») | [PyPI](https://pypi.org/project/psycopg/3.2.3/) · [GitHub](https://github.com/psycopg/psycopg) | Драйвер PostgreSQL |
+| psycopg-binary | 3.2.3 (подтягивается extra `[binary]`) | LGPL-3.0 (то же определение на PyPI) | [PyPI](https://pypi.org/project/psycopg-binary/3.2.3/) | Готовая сборка драйвера |
+| pydantic | 2.10.4 | MIT | [PyPI](https://pypi.org/project/pydantic/2.10.4/) · [GitHub](https://github.com/pydantic/pydantic) | Схемы запросов |
+| pydantic-settings | 2.7.0 | MIT | [PyPI](https://pypi.org/project/pydantic-settings/2.7.0/) · [GitHub](https://github.com/pydantic/pydantic-settings) | Настройки из окружения |
+| PyYAML | 6.0.2 | MIT | [PyPI](https://pypi.org/project/PyYAML/6.0.2/) · [GitHub](https://github.com/yaml/pyyaml) | Чтение `products.yaml` |
+| PyJWT | 2.10.1 | MIT | [PyPI](https://pypi.org/project/PyJWT/2.10.1/) · [GitHub](https://github.com/jpadilla/pyjwt) | JWT HS256 |
+| email-validator | 2.2.0 | Unlicense | [PyPI](https://pypi.org/project/email-validator/2.2.0/) · [GitHub](https://github.com/JoshData/python-email-validator) | Указан в `requirements.txt`; прямого импорта в `backend/app` нет (проверено поиском по коду) |
+| httpx | 0.28.1 | BSD-3-Clause | [PyPI](https://pypi.org/project/httpx/0.28.1/) · [GitHub](https://github.com/encode/httpx) | HTTP-клиент для egrul.nalog.ru и pb.nalog.ru |
+| pytest | 8.3.4 | MIT | [PyPI](https://pypi.org/project/pytest/8.3.4/) · [GitHub](https://github.com/pytest-dev/pytest) | Автотесты (ставится в тот же образ) |
+
+Про LGPL: psycopg используется как неизменённая библиотека, исходники проекта psycopg доступны по ссылке выше. Юридическую оценку совместимости с лицензией вашего решения проект не даёт.
+
+### Транзитивные зависимости backend
+
+`requirements.txt` не содержит lock-файла: транзитивные пакеты (например, `starlette`, `pydantic-core`, `anyio`, `h11`, `httpcore`, `certifi`, `idna`, `sniffio`, `click`, `Mako`, `MarkupSafe`, `typing-extensions`, `dnspython`, `annotated-types`) выбирает `pip` в момент сборки образа. Их точные версии в репозитории не зафиксированы и поимённо в этом документе не сверялись.
+
+Единственный транзитивный пакет, проверенный отдельно, — `starlette` 0.41.3: BSD-3-Clause ([PyPI](https://pypi.org/project/starlette/0.41.3/)). Это версия, которую мы проверяли, а не гарантированно установленная в образе.
+
+Чтобы получить полный список с версиями после сборки (команда не запускалась в рамках подготовки документов):
+
+```text
+docker compose run --rm --no-deps api pip list --format=freeze
+```
+
+## 2. Frontend (`frontend/package.json`, `frontend/package-lock.json`, lockfileVersion 3)
+
+Прямые зависимости закреплены точными версиями. Лицензии взяты из поля `license` в `package-lock.json`.
+
+| Пакет | Версия | Тип | Лицензия | Первоисточник | Зачем |
+|---|---|---|---|---|---|
+| react | 18.3.1 | prod | MIT | [npm](https://www.npmjs.com/package/react/v/18.3.1) | UI |
+| react-dom | 18.3.1 | prod | MIT | [npm](https://www.npmjs.com/package/react-dom/v/18.3.1) | Отрисовка в браузере |
+| react-router-dom | 6.28.1 | prod | MIT | [npm](https://www.npmjs.com/package/react-router-dom/v/6.28.1) | Маршруты кабинетов |
+| @types/react | 18.3.18 | dev | MIT | [npm](https://www.npmjs.com/package/@types/react/v/18.3.18) | Типы |
+| @types/react-dom | 18.3.5 | dev | MIT | [npm](https://www.npmjs.com/package/@types/react-dom/v/18.3.5) | Типы |
+| @vitejs/plugin-react | 4.3.4 | dev | MIT | [npm](https://www.npmjs.com/package/@vitejs/plugin-react/v/4.3.4) | Сборка JSX |
+| typescript | 5.7.2 | dev | Apache-2.0 | [npm](https://www.npmjs.com/package/typescript/v/5.7.2) | Типизация |
+| vite | 6.0.6 | dev | MIT | [npm](https://www.npmjs.com/package/vite/v/6.0.6) | Сборка и dev-сервер |
+
+Транзитивные зависимости зафиксированы в `package-lock.json`: 119 пакетов (кроме корневого). Распределение лицензий по полю `license`: MIT — 110, ISC — 5, Apache-2.0 — 2, BSD-3-Clause — 1, CC-BY-4.0 — 1. Пакетов без указанной лицензии нет. Не-MIT пакеты:
+
+| Пакет | Версия | Лицензия | Тип |
+|---|---|---|---|
+| typescript | 5.7.2 | Apache-2.0 | dev |
+| baseline-browser-mapping | 2.11.31 | Apache-2.0 | dev |
+| electron-to-chromium | 1.5.463 | ISC | dev |
+| lru-cache | 5.1.1 | ISC | dev |
+| picocolors | 1.1.1 | ISC | dev |
+| semver | 6.3.1 | ISC | dev |
+| yallist | 3.1.1 | ISC | dev |
+| source-map-js | 1.2.2 | BSD-3-Clause | dev |
+| caniuse-lite | 1.0.30001819 | CC-BY-4.0 | dev |
+
+Production-зависимости, попадающие в итоговый бандл (8 пакетов): react, react-dom, react-router, react-router-dom, @remix-run/router, scheduler, loose-envify, js-tokens — все MIT. Остальное нужно только на этапе сборки (`npm ci && npm run build`) и в образ nginx не попадает: в него копируется только каталог `dist`.
+
+Шрифты: используется системный стек шрифтов, CDN и внешние файлы шрифтов не подключаются.
+
+## 3. Docker-образы
+
+| Образ | Где | Версия (тег) | Лицензия основного ПО | Первоисточник | Зачем |
+|---|---|---|---|---|---|
+| postgres | `docker-compose.yml` | `16-alpine` | PostgreSQL License | [postgresql.org/about/licence](https://www.postgresql.org/about/licence/) | База данных |
+| nginx | `frontend/Dockerfile` (этап запуска) | `1.27-alpine` | BSD-2-Clause | [nginx.org/LICENSE](https://nginx.org/LICENSE) | Раздача SPA и прокси `/api` |
+| python | `backend/Dockerfile` | `3.12-slim` | PSF License Version 2 | [docs.python.org/3.12/license](https://docs.python.org/3.12/license.html) | Среда выполнения API |
+| node | `frontend/Dockerfile` (этап сборки) | `22-alpine` | MIT | [github.com/nodejs/node/LICENSE](https://github.com/nodejs/node/blob/main/LICENSE) | Только сборка frontend |
+
+Базовые слои образов (Alpine Linux для `*-alpine`, Debian для `python:3.12-slim`) содержат собственные пакеты со своими лицензиями. Поимённо они здесь не перечислены. Состав зависит от точной сборки образа на момент `docker compose up --build`, теги не привязаны к digest.
+
+## 4. Внешние источники информации
+
+| Источник | Что используется | Когда вызывается | Ограничения |
+|---|---|---|---|
+| [egrul.nalog.ru](https://egrul.nalog.ru/) — открытый поиск ЕГРЮЛ/ЕГРИП (ФНС России) | Название, ОГРН, КПП, руководитель, дата регистрации, регион | Только для ИНН, не входящих в демонстрационный набор. Запрос идёт с сервера `api` (`httpx`) | Нужен доступ в интернет из контейнера. Улица и дом поиском не отдаются. Это не подписанная выписка. Условия использования сервиса в рамках подготовки документов не изучались |
+| [pb.nalog.ru](https://pb.nalog.ru/) — «Прозрачный бизнес» (ФНС России) | Адрес, ОКВЭД, статус, уставный капитал и (если ФНС их опубликовала) численность, режим, недоимка | Только для ИНН вне демонстрационного набора | Нужен интернет. Если сервис не ответил, карточка помечается как неполная. Условия использования не изучались |
+
+Для настоящего ИНН кредитное бюро не запрашивается: открытой выдачи кредитной истории по ИНН нет, «чистая» история не подставляется (`available: false`).
+
+Для демо-ИНН внешние сервисы не вызываются.
+
+## 5. Локальные симуляторы и синтетические данные
+
+| Имя в продукте | Что это на самом деле | Где |
+|---|---|---|
+| ЕГРЮЛ / ЕГРИП для демо-ИНН | Локальная фикстура | `backend/app/mocks/fixtures.py` |
+| БКИ (кредитная история) | Полностью синтетические данные. Реального бюро нет ни для демо-, ни для настоящих ИНН | `backend/app/mocks/` |
+| ФНС «Прозрачный бизнес» для демо-ИНН | Локальная фикстура | `backend/app/mocks/fixtures.py` |
+
+Демо-ИНН: `7700000001`–`7700000005` (профили заявки) и `7700000099` (имитация сбоя источника). Компании, ОГРН, ФИО и суммы в фикстурах вымышленные. Совпадения с реальными организациями случайны. Любая другая 10- или 12-значная строка, не входящая в этот набор, уходит в реальные сервисы ФНС (раздел 4).
+
+Ограничения интеграций:
+
+- настоящих интеграций с банком-кредитором, НБКИ/ОКБ, СМЭВ, ЭЦП и платёжными системами нет;
+- подписание договора и выдача денег смоделированы на экране, платежей нет;
+- результаты оценки не являются кредитным решением реального банка.
+
+## 6. Модели ИИ и платные сервисы
+
+- LLM и любые сторонние модели машинного обучения в проекте не используются. Скоринг — набор правил (`backend/app/domain/scoring.py`), матрица «положение × обслуживание долга» по мотивам Положения Банка России № 590-П. Резервы не рассчитываются.
+- Платные API, облачные сервисы, сторонние CDN, аналитика и телеметрия не подключены. Это подтверждено чтением кода и конфигурации, а не запуском сетевого мониторинга.
+- Основной демо-сценарий на демо-ИНН полностью работает локально и не зависит от внешних сервисов. Исключение — сборка образов при `docker compose up --build`: нужен доступ к реестрам Docker Hub, PyPI и npm (если образы и зависимости не закешированы).

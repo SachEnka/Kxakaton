@@ -150,7 +150,7 @@ frontend/           React-приложение и конфигурация nginx
 docs/               документация (список ниже)
 docker-compose.yml  db, api, web
 start.bat           запуск на Windows
-THIRD_PARTY_NOTICES.md  сторонние компоненты и источники
+THIRD_PARTY_NOTICES     сторонние компоненты и источники
 ```
 
 ## 12. Обязательные документы
@@ -166,7 +166,7 @@ THIRD_PARTY_NOTICES.md  сторонние компоненты и источн�
 | [docs/DEMO.md](docs/DEMO.md) | пошаговые сценарии показа |
 | [docs/REQUIREMENTS_CHECKLIST.md](docs/REQUIREMENTS_CHECKLIST.md) | матрица требований и известные дефекты |
 | [docs/product-research.md](docs/product-research.md) | продуктовое обоснование (гипотезы) |
-| [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md) | сторонние компоненты, лицензии, источники ([краткая версия](docs/THIRD_PARTY_NOTICES.md)) |
+| [THIRD_PARTY_NOTICES](THIRD_PARTY_NOTICES) | сторонние компоненты, лицензии, источники ([краткая версия](docs/THIRD_PARTY_NOTICES.md)) |
 | [docs/SUBMISSION.md](docs/SUBMISSION.md) | материалы для сдачи, порядок тега, доступ жюри |
 | [docs/TZ.md](docs/TZ.md) | исходное техническое задание |
 

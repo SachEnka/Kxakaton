@@ -1,8 +1,8 @@
 # THIRD_PARTY_NOTICES
 
-Полный перечень (библиотеки с версиями и лицензиями, образы Docker, внешние источники, синтетические данные, отсутствие LLM) лежит в корне репозитория: [../THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md). Этот файл — короткая сводка, чтобы две копии не расходились.
+Полный перечень (библиотеки с версиями и лицензиями, образы Docker, внешние источники, синтетические данные, отсутствие LLM) лежит в корне репозитория: [../THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES). Этот файл — короткая сводка, чтобы две копии не расходились.
 
-- Backend: 13 прямых зависимостей Python с закреплёнными версиями. psycopg — LGPL-3.0, остальные MIT, BSD-3-Clause и Unlicense.
+- Backend: 12 прямых записей в `backend/requirements.txt` с закреплёнными версиями (`psycopg-binary` ставится как extra `psycopg[binary]` и отдельной прямой записью не считается). psycopg — LGPL-3.0, остальные MIT, BSD-3-Clause и Unlicense.
 - Frontend: 8 прямых зависимостей и 119 пакетов в `package-lock.json`: MIT, ISC, Apache-2.0, BSD-3-Clause, CC-BY-4.0 (последние — только при сборке).
 - Образы: `postgres:16-alpine`, `nginx:1.27-alpine`, `python:3.12-slim`, `node:22-alpine`.
 - LLM, платных API и сторонних моделей нет. Основной демо-сценарий на демо-ИНН не зависит от внешних сервисов.

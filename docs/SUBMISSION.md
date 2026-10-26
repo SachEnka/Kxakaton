@@ -135,6 +135,6 @@ docker compose up --build -d
 | Сценарии показа | [DEMO.md](DEMO.md) |
 | Матрица требований | [REQUIREMENTS_CHECKLIST.md](REQUIREMENTS_CHECKLIST.md) |
 | Продуктовое обоснование | [product-research.md](product-research.md) |
-| THIRD_PARTY_NOTICES | [../THIRD_PARTY_NOTICES.md](../THIRD_PARTY_NOTICES.md) (краткая версия: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)) |
+| THIRD_PARTY_NOTICES | [../THIRD_PARTY_NOTICES](../THIRD_PARTY_NOTICES) (краткая версия: [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)) |
 | ТЗ | [TZ.md](TZ.md) |
 | README / запуск | [../README.md](../README.md) |

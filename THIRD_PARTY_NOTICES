@@ -8,7 +8,7 @@
 
 ## 1. Backend: прямые зависимости (`backend/requirements.txt`)
 
-Версии закреплены (`==`). Python-образ — `python:3.12-slim`.
+В `requirements.txt` 12 прямых записей, версии закреплены (`==`). `psycopg-binary` не отдельная запись, а пакет, который `pip` ставит вместе с `psycopg[binary]` (extra), поэтому в таблице он показан отдельной строкой, но в число прямых записей не входит. Python-образ — `python:3.12-slim`.
 
 | Пакет | Версия | Лицензия | Первоисточник | Зачем в проекте |
 |---|---|---|---|---|
@@ -17,7 +17,7 @@
 | sqlalchemy | 2.0.36 | MIT | [PyPI](https://pypi.org/project/SQLAlchemy/2.0.36/) · [GitHub](https://github.com/sqlalchemy/sqlalchemy/) | ORM, доступ к PostgreSQL |
 | alembic | 1.14.0 | MIT | [PyPI](https://pypi.org/project/alembic/1.14.0/) · [GitHub](https://github.com/sqlalchemy/alembic/) | Миграция `0001_initial` |
 | psycopg[binary] (psycopg) | 3.2.3 | LGPL-3.0 (на PyPI: «GNU Lesser General Public License v3 (LGPLv3)») | [PyPI](https://pypi.org/project/psycopg/3.2.3/) · [GitHub](https://github.com/psycopg/psycopg) | Драйвер PostgreSQL |
-| psycopg-binary | 3.2.3 (подтягивается extra `[binary]`) | LGPL-3.0 (то же определение на PyPI) | [PyPI](https://pypi.org/project/psycopg-binary/3.2.3/) | Готовая сборка драйвера |
+| psycopg-binary (extra, не прямая запись) | 3.2.3 (подтягивается extra `[binary]`) | LGPL-3.0 (то же определение на PyPI) | [PyPI](https://pypi.org/project/psycopg-binary/3.2.3/) | Готовая сборка драйвера |
 | pydantic | 2.10.4 | MIT | [PyPI](https://pypi.org/project/pydantic/2.10.4/) · [GitHub](https://github.com/pydantic/pydantic) | Схемы запросов |
 | pydantic-settings | 2.7.0 | MIT | [PyPI](https://pypi.org/project/pydantic-settings/2.7.0/) · [GitHub](https://github.com/pydantic/pydantic-settings) | Настройки из окружения |
 | PyYAML | 6.0.2 | MIT | [PyPI](https://pypi.org/project/PyYAML/6.0.2/) · [GitHub](https://github.com/yaml/pyyaml) | Чтение `products.yaml` |

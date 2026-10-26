@@ -1,6 +1,35 @@
-@base = http://localhost:8000
+# Коллекция запросов к API «Умный кредитный кабинет предпринимателя».
+# Формат: расширение REST Client для VS Code (файлы .http). В IntelliJ HTTP Client синтаксис `{{имя.response.body...}}` тоже работает.
+#
+# Покрыты все 21 метода API, описанных в docs/openapi.json (20 маршрутов /api/... и GET /health).
+# Запросы составлены по коду и схемам backend/app/schemas.py, в работающем приложении не выполнялись.
+#
+# Как получить и подставить токены (JWT HS256, живёт 12 часов, роль зашита в токен):
+#   1. Запустите приложение: docker compose up --build. Дождитесь GET /health -> {"status":"ok"}.
+#   2. Нажмите «Send Request» над запросом "login client" (имя client_login).
+#      Токен для клиента берётся автоматически из поля access_token ответа в переменную @token.
+#   3. То же для "login underwriter" (имя underwriter_login): токен сотрудника попадает в @underwriter_token.
+#   4. Если ваш клиент не поддерживает цепочки: скопируйте access_token из ответа вручную
+#      и вставьте его вместо значений @token / @underwriter_token ниже.
+#   5. Запрос "create draft" вернёт заявку. Скопируйте её поле id в @application_id (или используйте цепочку ниже).
+#   6. Токен клиента не работает на маршрутах /api/underwriter (ответ 403), токен сотрудника не работает на клиентских маршрутах (403).
+#
+# Демо-пользователи, пароль у всех Demo-2026:
+#   client.good@demo.local, client.offer@demo.local, client.reject@demo.local, client.info@demo.local, underwriter@demo.local.
+#
+# Запросов «запрос документов» в API нет. Ближайшее реальное действие сотрудника — запрос уточнения
+# (вопрос клиенту текстом): POST /api/underwriter/applications/{id}/request-info.
 
-### login
+@base = http://localhost:8000
+@token = {{client_login.response.body.access_token}}
+@underwriter_token = {{underwriter_login.response.body.access_token}}
+@application_id = {{create_draft.response.body.id}}
+
+### health (без авторизации)
+GET {{base}}/health
+
+### login client
+# @name client_login
 POST {{base}}/api/auth/login
 Content-Type: application/json
 
@@ -9,7 +38,36 @@ Content-Type: application/json
   "password": "Demo-2026"
 }
 
-### recommend
+### login underwriter
+# @name underwriter_login
+POST {{base}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "underwriter@demo.local",
+  "password": "Demo-2026"
+}
+
+### register (новая клиентская учётка; email должен быть новым, повтор вернёт ошибку)
+POST {{base}}/api/auth/register
+Content-Type: application/json
+
+{
+  "email": "new.client@example.com",
+  "password": "Demo-2026",
+  "full_name": "Новый Клиент",
+  "phone": "+79990000000"
+}
+
+### me (кто я по токену)
+GET {{base}}/api/auth/me
+Authorization: Bearer {{token}}
+
+### products (каталог продуктов)
+GET {{base}}/api/applications/products
+Authorization: Bearer {{token}}
+
+### recommend (подбор продукта; purpose: TURNOVER | DEVELOPMENT | CASH_GAP | UNKNOWN)
 POST {{base}}/api/applications/recommend
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -20,7 +78,16 @@ Content-Type: application/json
   "term_months": 18
 }
 
+### registry demo inn (карточка организации; демо-ИНН из локальных фикстур)
+GET {{base}}/api/registry/7700000001
+Authorization: Bearer {{token}}
+
+### registry real inn (настоящий ИНН: запрос уходит в открытые сервисы ФНС, нужен интернет у контейнера api)
+GET {{base}}/api/registry/7728168971
+Authorization: Bearer {{token}}
+
 ### create draft
+# @name create_draft
 POST {{base}}/api/applications
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -32,7 +99,11 @@ Content-Type: application/json
   "term_months": 18
 }
 
-### fill draft
+### list my applications
+GET {{base}}/api/applications
+Authorization: Bearer {{token}}
+
+### fill draft (PATCH; legal_form: OOO | IP; демо-ИНН клиента client.good — 7700000001)
 PATCH {{base}}/api/applications/{{application_id}}
 Authorization: Bearer {{token}}
 Content-Type: application/json
@@ -41,22 +112,86 @@ Content-Type: application/json
   "inn": "7700000001",
   "legal_form": "OOO",
   "monthly_revenue": 800000,
-  "monthly_expenses": 450000
+  "monthly_expenses": 450000,
+  "comment": "Пополнение оборотных средств"
 }
 
-### submit
+### submit (запускает конвейер синхронно; ответ уже содержит итоговый статус)
 POST {{base}}/api/applications/{{application_id}}/submit
 Authorization: Bearer {{token}}
 
-### read
+### read application
 GET {{base}}/api/applications/{{application_id}}
 Authorization: Bearer {{token}}
 
-### registry by inn
-GET {{base}}/api/registry/7728168971
+### answers (ответ клиента на уточнение банка; работает, только когда заявка в статусе NEED_INFO и есть вопрос без ответа)
+# Подходит для сценария client.info@demo.local, ИНН 7700000005: войдите этой учёткой, пройдите заявку до «Нужны уточнения».
+POST {{base}}/api/applications/{{application_id}}/answers
+Authorization: Bearer {{token}}
+Content-Type: application/json
+
+{
+  "answer": "Компания работает с 2023 года, выручка за последние месяцы стабильна",
+  "monthly_revenue": 600000
+}
+
+### accept offer (APPROVED или APPROVED_WITH_CHANGES -> CONTRACTING)
+POST {{base}}/api/applications/{{application_id}}/accept-offer
+Authorization: Bearer {{token}}
+
+### decline offer (APPROVED_WITH_CHANGES -> CANCELLED; для демо подойдёт client.offer@demo.local, ИНН 7700000002)
+POST {{base}}/api/applications/{{application_id}}/decline-offer
+Authorization: Bearer {{token}}
+
+### sign (CONTRACTING -> ISSUED; подписание и выдача смоделированы, электронной подписи и перевода денег нет)
+POST {{base}}/api/applications/{{application_id}}/sign
 Authorization: Bearer {{token}}
 
 ### underwriter queue
-# token сотрудника underwriter@demo.local / Demo-2026
 GET {{base}}/api/underwriter/applications
 Authorization: Bearer {{underwriter_token}}
+
+### underwriter detail (подставьте id заявки клиента; можно использовать тот же @application_id)
+GET {{base}}/api/underwriter/applications/{{application_id}}
+Authorization: Bearer {{underwriter_token}}
+
+### underwriter confirm (подтвердить решение системы; в DECISION_READY переводит заявку в решение последнего расчёта)
+POST {{base}}/api/underwriter/applications/{{application_id}}/confirm
+Authorization: Bearer {{underwriter_token}}
+
+### underwriter override (ручное решение; decision: APPROVED | APPROVED_WITH_CHANGES | REJECTED, comment от 3 символов)
+# Известный дефект: сервер не проверяет, завершён ли конвейер. Не используйте на черновике.
+POST {{base}}/api/underwriter/applications/{{application_id}}/override
+Authorization: Bearer {{underwriter_token}}
+Content-Type: application/json
+
+{
+  "decision": "APPROVED_WITH_CHANGES",
+  "comment": "Одобряем меньшую сумму после ручной проверки",
+  "amount": 1000000,
+  "term_months": 12,
+  "rate": 22.5
+}
+
+### underwriter override reject (отказ: сумма, срок и ставка не нужны)
+POST {{base}}/api/underwriter/applications/{{application_id}}/override
+Authorization: Bearer {{underwriter_token}}
+Content-Type: application/json
+
+{
+  "decision": "REJECTED",
+  "comment": "Отказ после ручной проверки"
+}
+
+### underwriter request-info (вопрос клиенту; заявка переходит в NEED_INFO. Это не «запрос документов»)
+POST {{base}}/api/underwriter/applications/{{application_id}}/request-info
+Authorization: Bearer {{underwriter_token}}
+Content-Type: application/json
+
+{
+  "question": "Уточните, пожалуйста, структуру выручки за последние три месяца"
+}
+
+### role isolation: токен клиента на маршруте сотрудника (ожидается 403 «Этот раздел доступен сотруднику банка»)
+GET {{base}}/api/underwriter/applications
+Authorization: Bearer {{token}}
